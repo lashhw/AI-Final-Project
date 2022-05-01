@@ -8,10 +8,7 @@ def preprocess(df):
 	# change invalid (AVAILABLECAR <= -9) data to NaN
 	df = df.mask(df<=-9.0)
 
-	# remove invalid parking lot
-	df = df.dropna(axis='columns')
-
-	# fill to ensure all value is valid
+	# fill to ensure all value are valid
 	df = df.ffill().bfill()
 
 	rolling_df = df.rolling(window='60min').mean()
