@@ -18,7 +18,7 @@ ids_train = np.load('./PredictFuture/ids_train.npy')
 scaler_min = np.load('./PredictFuture/scaler_min.npy')
 scaler_max = np.load('./PredictFuture/scaler_max.npy')
 
-parking_model = ParkingModel(276, 96)
+parking_model = ParkingModel(250, 96)
 parking_model.load_state_dict(torch.load('./PredictFuture/parking_model.pt', map_location=torch.device('cpu')))
 parking_model.eval()
 
