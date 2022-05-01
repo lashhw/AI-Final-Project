@@ -38,7 +38,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Connection Established.')
 
     id_name = '_' + id_str
-    date_start = (datetime.now()-timedelta(days=7)).strftime('%Y-%m-%d')
+    date_start = (datetime.now()-timedelta(days=3)).strftime('%Y-%m-%d')
 
     entities = table_client.query_entities(f"PartitionKey ge '{date_start}'", select=['RowKey', id_name])
     entities_list = list(entities)
@@ -50,7 +50,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     prediction, prediction_times = evaluate(df, ids_train, scaler_min, scaler_max, parking_model)
     prediction_times_str = [x.strftime('%Y-%m-%d %H:%M') for x in prediction_times]
-    prediction_pairs = list(zip(prediction_times_str, 
+    prediction_pairs = dict(zip(prediction_times_str, 
                                 prediction.squeeze().tolist()))
     prediction_str = json.dumps(prediction_pairs)
 
