@@ -38,7 +38,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Connection Established.')
 
     id_name = '_' + id_str
-    date_start = (datetime.now()-timedelta(days=3)).strftime('%Y-%m-%d')
+    date_start = (datetime.utcnow()-timedelta(days=3)).strftime('%Y-%m-%d')
 
     entities = table_client.query_entities(f"PartitionKey ge '{date_start}'", select=['RowKey', id_name])
     entities_list = list(entities)
