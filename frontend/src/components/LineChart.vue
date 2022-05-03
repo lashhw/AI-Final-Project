@@ -8,6 +8,7 @@
 <script>
 import { Line } from 'vue-chartjs'
 import Chart from 'chart.js/auto';
+import 'chartjs-adapter-date-fns';
 
 export default {
   name: 'BarChart',

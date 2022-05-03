@@ -7,7 +7,14 @@ export default {
       id_input: null,
       id: null,
       prediction: {},
-      history: {}
+      history: {},
+      chart_options: {
+        scales: {
+            x: {
+                type: 'time'
+            }
+        }
+      }
     }
   },
   computed: {
@@ -58,8 +65,8 @@ export default {
 <template>
   <input v-model="id_input" placeholder="停車場 ID" />
   <button @click.prevent="get_data"> 送出 </button>
-  <LineChart :chart-data='chart_history_data' />
-  <LineChart :chart-data='chart_prediction_data' />
+  <LineChart :chart-data='chart_history_data' :chart-options="chart_options" />
+  <LineChart :chart-data='chart_prediction_data' :chart-options="chart_options" />
 </template>
 
 <style>
