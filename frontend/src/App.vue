@@ -4,31 +4,51 @@ import LineChart from './components/LineChart.vue'
 export default {
   data() {
     return {
+      id_input: null,
       id: null,
-      result: {}
+      prediction: {},
+      history: {}
     }
   },
   computed: {
-    chartData() {
+    chart_prediction_data() {
       return {
-        labels: Object.keys(this.result),
-        datasets: [ {
-            label: null,
-            data: Object.values(this.result) 
-          }
-        ]
+        labels: Object.keys(this.prediction),
+        datasets: [{
+            label: this.id,
+            data: Object.values(this.prediction) 
+        }]
+      }
+    },
+    chart_history_data() {
+      return {
+        labels: Object.keys(this.history),
+        datasets: [{
+            label: this.id,
+            data: Object.values(this.history) 
+        }]
       }
     }
   },
   methods: {
-    getPrediction(event) {
+    get_data() {
       fetch(
-        `https://ntpcparking.azurewebsites.net/api/predictfuture?id=${this.id}`
-      ).then(res => {
-        return res.json()
+        `https://ntpcparking.azurewebsites.net/api/gethistory?id=${this.id_input}&max_days=0`
+      ).then(response => {
+        return response.json()
       }).then(result => {
-        this.result = result
+        this.history = result
       })
+
+      fetch(
+        `https://ntpcparking.azurewebsites.net/api/predictfuture?id=${this.id_input}`
+      ).then(response => {
+        return response.json()
+      }).then(result => {
+        this.prediction = result
+      })
+
+      this.id = this.id_input
     }
   },
   components: { LineChart }
@@ -36,9 +56,10 @@ export default {
 </script>
 
 <template>
-  <input v-model="id" placeholder="停車場 ID" />
-  <button @click.prevent="getPrediction"> 送出 </button>
-  <LineChart :chart-data='chartData' />
+  <input v-model="id_input" placeholder="停車場 ID" />
+  <button @click.prevent="get_data"> 送出 </button>
+  <LineChart :chart-data='chart_history_data' />
+  <LineChart :chart-data='chart_prediction_data' />
 </template>
 
 <style>
