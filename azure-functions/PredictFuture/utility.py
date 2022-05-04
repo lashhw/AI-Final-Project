@@ -14,7 +14,7 @@ def preprocess(df):
 	rolling_df = df.rolling(window='60min').mean()
 	rolling_df.index = rolling_df.index - timedelta(minutes=30)
 
-	smooth_df = rolling_df.resample('15min').mean()
+	smooth_df = rolling_df.resample('15min', offset='7.5min').mean()
 	smooth_df.index = smooth_df.index + timedelta(minutes=7.5)
 	smooth_df = smooth_df.ffill().bfill()
 	assert smooth_df.isna().to_numpy().any() == False
