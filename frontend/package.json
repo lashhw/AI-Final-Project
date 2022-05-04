@@ -7,11 +7,9 @@
     "preview": "vite preview --port 5050"
   },
   "dependencies": {
-    "chart.js": "^3.7.1",
-    "chartjs-adapter-date-fns": "^2.0.0",
-    "date-fns": "^2.28.0",
+    "apexcharts": "^3.35.0",
     "vue": "^3.2.33",
-    "vue-chartjs": "^4.0.7"
+    "vue3-apexcharts": "^1.4.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.1",

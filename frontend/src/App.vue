@@ -1,72 +1,61 @@
 <script>
-import LineChart from './components/LineChart.vue'
+import AreaChart from './components/AreaChart.vue'
 
 export default {
   data() {
     return {
-      id_input: null,
       id: null,
-      prediction: {},
       history: {},
+      prediction: {},
       chart_options: {
-        scales: {
-            x: {
-                type: 'time'
-            }
+        xaxis: {
+          type: 'datetime'
+        },
+        yaxis: {
+          decimalsInFloat: 0
+        },
+        dataLabels: {
+          enabled: false
+        },
+        tooltip: {
+          x: {
+            format: 'dd MMM hh:mm TT'
+          }
         }
       }
     }
   },
   computed: {
-    chart_prediction_data() {
-      return {
-        labels: Object.keys(this.prediction),
-        datasets: [{
-            label: this.id,
-            data: Object.values(this.prediction) 
-        }]
-      }
-    },
-    chart_history_data() {
-      return {
-        labels: Object.keys(this.history),
-        datasets: [{
-            label: this.id,
-            data: Object.values(this.history) 
-        }]
-      }
+    chart_series() {
+      return [
+        {
+          name: "history",
+          data: Object.entries(this.history)
+        },
+        {
+          name: "prediction",
+          data: Object.entries(this.prediction)
+        }
+      ]
     }
   },
   methods: {
-    get_data() {
-      fetch(
-        `https://ntpcparking.azurewebsites.net/api/gethistory?id=${this.id_input}&max_days=0`
-      ).then(response => {
-        return response.json()
-      }).then(result => {
-        this.history = result
-      })
+    async get_data() {
+      const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${this.id}&max_days=0`)
+      this.history = await res_history.json()
 
-      fetch(
-        `https://ntpcparking.azurewebsites.net/api/predictfuture?id=${this.id_input}`
-      ).then(response => {
-        return response.json()
-      }).then(result => {
-        this.prediction = result
-      })
-
-      this.id = this.id_input
+      const res_prediction = await fetch(`https://ntpcparking.azurewebsites.net/api/predictfuture?id=${this.id}`)
+      this.prediction = await res_prediction.json()
     }
   },
-  components: { LineChart }
+  components: { AreaChart }
 }
 </script>
 
 <template>
-  <input v-model="id_input" placeholder="停車場 ID" />
-  <button @click.prevent="get_data"> 送出 </button>
-  <LineChart :chart-data='chart_history_data' :chart-options="chart_options" />
-  <LineChart :chart-data='chart_prediction_data' :chart-options="chart_options" />
+  <input v-model="id" placeholder="停車場 ID" />
+  <button @click="get_data"> 送出 </button>
+  <AreaChart :series="chart_series" :options="chart_options" />
 </template>
 
 <style>
