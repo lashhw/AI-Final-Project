@@ -4,14 +4,15 @@
 set -e
 
 # build
-npm run build
+quasar build
 
 # navigate into the build output directory
-cd dist
+cd dist/spa
 
+git init
 git add -A
 git commit -m 'deploy'
 
-git push git@github.com:lashhw/AI-Final-Project.git main:gh-pages
+git push -f git@github.com:lashhw/AI-Final-Project.git main:gh-pages
 
 cd -

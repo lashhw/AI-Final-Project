@@ -1,8 +1,9 @@
 <template>
   <apexchart
     type="area"
-    :options="options"
     :series="series"
+    :height="height"
+    :options="options"
   ></apexchart>
 </template>
 
@@ -14,11 +15,14 @@ export default {
 	  apexchart: VueApexCharts
   },
   props: {
-    options: {
-      default: {}
-    },
     series: {
       required: true
+    },
+    height: {
+      required: true
+    },
+    options: {
+      default: {}
     }
   }
 }
