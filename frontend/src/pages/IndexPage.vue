@@ -9,6 +9,9 @@
       </div>
     </div>
     <AreaChart class="q-pa-md" :series="chart_series" height="50%" :options="chart_options" />
+    <div class="row flex-center">
+      <q-spinner-dots v-show="loading" color="primary" size="2em" />
+    </div>
   </q-page>
 </template>
 
@@ -30,7 +33,8 @@ export default {
       },
       history: {},
       prediction: {},
-      chart_series: []
+      chart_series: [],
+      loading: false
     }
   },
   computed: {
@@ -86,32 +90,38 @@ export default {
   },
   methods: {
     async update_series() {
-      const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${this.selection.lot.value.id}&max_days=1`)
-      this.history = await res_history.json()
+      this.loading = true;
+      try {
+        const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${this.selection.lot.value.id}&max_days=1`)
+        this.history = await res_history.json()
 
-      const res_prediction = await fetch(`https://ntpcparking.azurewebsites.net/api/predictfuture?id=${this.selection.lot.value.id}`)
-      this.prediction = await res_prediction.json()
+        const res_prediction = await fetch(`https://ntpcparking.azurewebsites.net/api/predictfuture?id=${this.selection.lot.value.id}`)
+        this.prediction = await res_prediction.json()
 
-      var history_pairs = Object.entries(this.history)
-      history_pairs.forEach(pair => pair[0] = Date.parse(`${pair[0]} GMT`))
-      var now = Date.now()
-      history_pairs = history_pairs.filter(pair => pair[0] >= now - 43200000)
+        var history_pairs = Object.entries(this.history)
+        history_pairs.forEach(pair => pair[0] = Date.parse(`${pair[0]} GMT`))
+        var now = Date.now()
+        history_pairs = history_pairs.filter(pair => pair[0] >= now - 43200000)
 
-      var last_history_time = history_pairs[history_pairs.length-1][0]
-      var prediction_pairs = Object.entries(this.prediction)
-      prediction_pairs.forEach(pair => pair[0] = Date.parse(`${pair[0]} GMT`))
-      prediction_pairs = prediction_pairs.filter(pair => pair[0] > last_history_time)
+        var last_history_time = history_pairs[history_pairs.length-1][0]
+        var prediction_pairs = Object.entries(this.prediction)
+        prediction_pairs.forEach(pair => pair[0] = Date.parse(`${pair[0]} GMT`))
+        prediction_pairs = prediction_pairs.filter(pair => pair[0] > last_history_time)
       
-      this.chart_series = [
-        {
-          name: 'History',
-          data: history_pairs
-        },
-        {
-          name: 'LSTM prediction',
-          data: prediction_pairs
-        }
-      ]
+        this.chart_series = [
+          {
+            name: 'History',
+            data: history_pairs
+          },
+          {
+            name: 'LSTM prediction',
+            data: prediction_pairs
+          }
+        ]
+      } catch (error) {
+        // error handling
+      }
+      this.loading = false;
     }
   },
   components: { AreaChart }
