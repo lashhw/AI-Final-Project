@@ -26,10 +26,7 @@ export default {
       info: info_json,
       selection: {
         area: "",
-        lot: {
-          label: "",
-          value: -1
-        }
+        lot: ""
       },
       history: {},
       prediction: {},
@@ -43,12 +40,12 @@ export default {
     },
     p_lot_list() {
       return this.info.filter(x => x.AREA === this.selection.area)
-                      .map(x => ({ label: x.NAME, value: { id: x.ID, name: x.NAME } }))
+                      .map(x => x.NAME)
     },
     chart_options() {
       return {
         title : {
-          text: `Parking Vacancy of ${this.selection.lot.value.name}`
+          text: `Parking Vacancy of ${this.selection.lot}`
         },
         xaxis: {
           type: "datetime",
@@ -85,17 +82,22 @@ export default {
   },
   watch: {
     'selection.lot'() {
-      this.update_series()
+      for (var i = 0; i < this.info.length; i++) {
+        if (this.info[i].NAME === this.selection.lot) {
+          this.update_series(this.info[i].ID)
+          return
+        }
+      }
     }
   },
   methods: {
-    async update_series() {
+    async update_series(id) {
       this.loading = true;
       try {
-        const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${this.selection.lot.value.id}&max_days=1`)
+        const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${id}&max_days=1`)
         this.history = await res_history.json()
 
-        const res_prediction = await fetch(`https://ntpcparking.azurewebsites.net/api/predictfuture?id=${this.selection.lot.value.id}`)
+        const res_prediction = await fetch(`https://ntpcparking.azurewebsites.net/api/predictfuture?id=${id}`)
         this.prediction = await res_prediction.json()
 
         var history_pairs = Object.entries(this.history)
