@@ -55,6 +55,11 @@ export default {
         title : {
           text: `Parking Vacancy of ${this.selection.lot}`
         },
+        chart: {
+          toolbar: {
+            offsetY: 20
+          }
+        },
         xaxis: {
           type: "datetime",
           labels: {
