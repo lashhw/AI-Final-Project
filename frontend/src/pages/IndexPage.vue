@@ -101,13 +101,19 @@ export default {
         this.prediction = await res_prediction.json()
 
         var history_pairs = Object.entries(this.history)
-        history_pairs.forEach(pair => pair[0] = Date.parse(`${pair[0]} GMT`))
+        for (var i = 0; i < history_pairs.length; i++) {
+          var splitted = history_pairs[i][0].split(/[- :]/)
+          history_pairs[i][0] = Date.UTC(splitted[0], splitted[1], splitted[2], splitted[3], splitted[4])
+        }
         var now = Date.now()
         history_pairs = history_pairs.filter(pair => pair[0] >= now - 43200000)
 
-        var last_history_time = history_pairs[history_pairs.length-1][0]
         var prediction_pairs = Object.entries(this.prediction)
-        prediction_pairs.forEach(pair => pair[0] = Date.parse(`${pair[0]} GMT`))
+        for (var i = 0; i < prediction_pairs.length; i++) {
+          var splitted = prediction_pairs[i][0].split(/[- :]/)
+          prediction_pairs[i][0] = Date.UTC(splitted[0], splitted[1], splitted[2], splitted[3], splitted[4])
+        }
+        var last_history_time = history_pairs[history_pairs.length-1][0]
         prediction_pairs = prediction_pairs.filter(pair => pair[0] > last_history_time)
       
         this.chart_series = [
