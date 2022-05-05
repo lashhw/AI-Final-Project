@@ -1,16 +1,24 @@
 <template>
   <q-page padding>
-    <div class="row flex-center q-col-gutter-sm">
-      <div class="col-5">
-        <q-select v-model="selection.area" :options="area_list" label="行政區" />
+    <div class="q-gutter-md">
+      <div class="row flex-center q-gutter-sm">
+        <div class="col-5">
+          <q-select v-model="selection.area" :options="area_list" label="行政區" />
+        </div>
+        <div class="col-5">
+          <q-select v-model="selection.lot" :options="p_lot_list" label="停車場名稱" />
+        </div>
       </div>
-      <div class="col-5">
-        <q-select v-model="selection.lot" :options="p_lot_list" label="停車場名稱" />
+      <div class="row flex-center">
+        <div class="col-12 col-xs-10 col-sm-8 col-md-6 col-lg-4">
+          <AreaChart :series="chart_series" :options="chart_options" />
+        </div>
       </div>
-    </div>
-    <AreaChart class="q-pa-md" :series="chart_series" height="50%" :options="chart_options" />
-    <div class="row flex-center">
-      <q-spinner-dots v-show="loading" color="primary" size="2em" />
+      <div class="row flex-center">
+        <div class="col-auto">
+          <q-spinner-dots v-show="loading" color="primary" size="2em" />
+        </div>
+      </div>
     </div>
   </q-page>
 </template>

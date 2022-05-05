@@ -2,7 +2,6 @@
   <apexchart
     type="area"
     :series="series"
-    :height="height"
     :options="options"
   ></apexchart>
 </template>
@@ -16,9 +15,6 @@ export default {
   },
   props: {
     series: {
-      required: true
-    },
-    height: {
       required: true
     },
     options: {
