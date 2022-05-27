@@ -1,12 +1,13 @@
 import azure.functions as func
+from azure.data.tables import TableServiceClient
 from datetime import datetime, timedelta
 import configparser
 import json
-from azure.data.tables import TableServiceClient
 
 config = configparser.ConfigParser()
 config.read('config.ini')
 connection_string = config['CONNECTION']['ConnectionString']
+
 table_service = TableServiceClient.from_connection_string(connection_string)
 table_client = table_service.get_table_client('parking')
 
