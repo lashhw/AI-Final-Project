@@ -2,6 +2,8 @@ from datetime import timedelta
 import numpy as np
 import torch
 import torch.nn.functional as F
+import json
+import pandas as pd
 
 
 def preprocess(df):
@@ -57,7 +59,7 @@ def inverse_scale(scaled, ids, ids_train, scaler_min, scaler_max):
 	return data.T
 
 
-def evaluate(df, ids_train, scaler_min, scaler_max, parking_model):
+def lstm_predict(df, ids_train, scaler_min, scaler_max, parking_model):
 	df, smooth_df = preprocess(df)
 	data, ids, times, weekdays, seconds = transform(smooth_df)
 
@@ -88,3 +90,16 @@ def evaluate(df, ids_train, scaler_min, scaler_max, parking_model):
 	prediction_times = [times[-1] + timedelta(minutes=15*(i+1)) for i in range(parking_model.predict_len)]
 	
 	return prediction, prediction_times
+
+
+def prophet_predict(id):
+	from prophet.serialize import model_from_json
+	with open(f'./PredictFuture/prophet_models/{id}.json') as f:
+		m = model_from_json(json.load(f))
+	
+	start_ts = pd.Timestamp.now().ceil('15min')
+	future_dt = pd.date_range(start=start_ts, periods=96, freq='15min')
+	future_df = future_dt.to_frame(name='ds').reset_index(drop=True)
+
+	forecast = m.predict(future_df)
+	return forecast['yhat'], future_dt

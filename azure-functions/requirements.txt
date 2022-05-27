@@ -2,9 +2,11 @@
 # The Python Worker is managed by Azure Functions platform
 # Manually managing azure-functions-worker may cause unexpected issues
 
+./local_wheels/prophet-1.0.1-py3-none-any.whl
+./local_wheels/PyMeeus-0.5.11-py3-none-any.whl
 azure-functions
 azure-data-tables
-pandas
 numpy
+pandas
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch

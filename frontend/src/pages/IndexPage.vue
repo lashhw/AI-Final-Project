@@ -10,7 +10,7 @@
         </div>
       </div>
       <div class="row flex-center">
-        <div class="col-12 col-xs-10 col-sm-8 col-md-6 col-lg-4">
+        <div class="col-12 col-xs-10 col-sm-8 col-md-6">
           <AreaChart :series="chart_series" :options="chart_options" />
         </div>
       </div>
@@ -36,8 +36,6 @@ export default {
         area: "",
         lot: ""
       },
-      history: {},
-      prediction: {},
       chart_series: [],
       loading: false
     }
@@ -53,7 +51,7 @@ export default {
     chart_options() {
       return {
         title : {
-          text: `Parking Vacancy of ${this.selection.lot}`
+          text: `Parking vacancy of ${this.selection.lot}`
         },
         chart: {
           toolbar: {
@@ -70,7 +68,7 @@ export default {
           decimalsInFloat: 0
         },
         stroke: {
-          dashArray: [0, 4]
+          dashArray: [0, 4, 4]
         },
         dataLabels: {
           enabled: false
@@ -108,12 +106,12 @@ export default {
       this.loading = true;
       try {
         const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${id}&max_days=1`)
-        this.history = await res_history.json()
+        var history = await res_history.json()
 
         const res_prediction = await fetch(`https://ntpcparking.azurewebsites.net/api/predictfuture?id=${id}`)
-        this.prediction = await res_prediction.json()
+        var prediction = await res_prediction.json()
 
-        var history_pairs = Object.entries(this.history)
+        var history_pairs = Object.entries(history)
         for (var i = 0; i < history_pairs.length; i++) {
           var splitted = history_pairs[i][0].split(/[- :]/)
           history_pairs[i][0] = Date.UTC(splitted[0], splitted[1]-1, splitted[2], splitted[3], splitted[4])
@@ -121,13 +119,19 @@ export default {
         var now = Date.now()
         history_pairs = history_pairs.filter(pair => pair[0] >= now - 43200000)
 
-        var prediction_pairs = Object.entries(this.prediction)
-        for (var i = 0; i < prediction_pairs.length; i++) {
-          var splitted = prediction_pairs[i][0].split(/[- :]/)
-          prediction_pairs[i][0] = Date.UTC(splitted[0], splitted[1]-1, splitted[2], splitted[3], splitted[4])
+        var lstm_pred_pairs = Object.entries(prediction['lstm'])
+        for (var i = 0; i < lstm_pred_pairs.length; i++) {
+          var splitted = lstm_pred_pairs[i][0].split(/[- :]/)
+          lstm_pred_pairs[i][0] = Date.UTC(splitted[0], splitted[1]-1, splitted[2], splitted[3], splitted[4])
         }
         var last_history_time = history_pairs[history_pairs.length-1][0]
-        prediction_pairs = prediction_pairs.filter(pair => pair[0] > last_history_time)
+        lstm_pred_pairs = lstm_pred_pairs.filter(pair => pair[0] > last_history_time)
+
+        var prophet_pred_pairs = Object.entries(prediction['prophet'])
+        for (var i = 0; i < prophet_pred_pairs.length; i++) {
+          var splitted = prophet_pred_pairs[i][0].split(/[- :]/)
+          prophet_pred_pairs[i][0] = Date.UTC(splitted[0], splitted[1]-1, splitted[2], splitted[3], splitted[4])
+        }
       
         this.chart_series = [
           {
@@ -136,7 +140,11 @@ export default {
           },
           {
             name: 'LSTM prediction',
-            data: prediction_pairs
+            data: lstm_pred_pairs
+          },
+          {
+            name: 'Prophet prediction',
+            data: prophet_pred_pairs
           }
         ]
       } catch (error) {
