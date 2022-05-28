@@ -127,7 +127,7 @@ export default {
         var last_history_time = history_pairs[history_pairs.length-1][0]
         lstm_pred_pairs = lstm_pred_pairs.filter(pair => pair[0] > last_history_time)
 
-        var prophet_pred_pairs = Object.entries(prediction['prophet'])
+        var prophet_pred_pairs = Object.entries(prediction['prophet_yhat'])
         for (var i = 0; i < prophet_pred_pairs.length; i++) {
           var splitted = prophet_pred_pairs[i][0].split(/[- :]/)
           prophet_pred_pairs[i][0] = Date.UTC(splitted[0], splitted[1]-1, splitted[2], splitted[3], splitted[4])

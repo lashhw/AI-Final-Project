@@ -136,6 +136,3 @@ __azurite_db*__.json
 
 # Config file
 config.ini
-
-# Prophet models
-prophet_models

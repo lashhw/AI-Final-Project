@@ -25,6 +25,8 @@ parking_model = ParkingModel(250, 96)
 parking_model.load_state_dict(torch.load('./PredictFuture/parking_model.pt', map_location=torch.device('cpu')))
 parking_model.eval()
 
+prophet_model = np.load('./PredictFuture/prophet_model.npy')
+
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     id_str = req.params.get('id')
@@ -50,11 +52,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     lstm_pred_times_str = [x.strftime('%Y-%m-%d %H:%M') for x in lstm_pred_times]
     lstm_pred_pairs = dict(zip(lstm_pred_times_str, lstm_pred.squeeze().tolist()))
 
-    prophet_pred, prophet_pred_times = prophet_predict(id)
+    prophet_pred, prophet_pred_times = prophet_predict(id, ids_train, 96, prophet_model)
     prophet_pred_times_str = [x.strftime('%Y-%m-%d %H:%M') for x in prophet_pred_times]
-    prophet_pred_pairs = dict(zip(prophet_pred_times_str, prophet_pred))
+    prophet_pred_yhat_pairs = dict(zip(prophet_pred_times_str, prophet_pred[0]))
+    prophet_pred_yhat_lower_pairs = dict(zip(prophet_pred_times_str, prophet_pred[1]))
+    prophet_pred_yhat_upper_pairs = dict(zip(prophet_pred_times_str, prophet_pred[2]))
 
-    pred_str = json.dumps({'lstm': lstm_pred_pairs, 'prophet': prophet_pred_pairs})
+    pred_str = json.dumps({
+        'lstm': lstm_pred_pairs, 
+        'prophet_yhat': prophet_pred_yhat_pairs,
+        'prophet_yhat_lower': prophet_pred_yhat_lower_pairs,
+        'prophet_yhat_upper': prophet_pred_yhat_upper_pairs,
+    })
 
     return func.HttpResponse(
         pred_str,
