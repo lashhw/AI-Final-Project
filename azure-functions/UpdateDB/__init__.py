@@ -5,11 +5,14 @@ from azure.data.tables import TableEntity
 from datetime import datetime
 from urllib.request import urlopen
 import pandas as pd
+import numpy as np
 import configparser
 
 config = configparser.ConfigParser()
 config.read('config.ini')
 connection_string = config['CONNECTION']['ConnectionString']
+
+ids_train = np.load('./PredictFuture/ids_train.npy')
 
 table_service = TableServiceClient.from_connection_string(conn_str=connection_string)
 
@@ -27,9 +30,10 @@ def update_db():
 	task['RowKey'] = time_str
 
 	for _, data in df.iterrows():
-		column = '_' + str(data['ID'])
-		value = str(data['AVAILABLECAR'])
-		task[column] = value
+		if data['ID'] in ids_train:
+			column = '_' + str(data['ID'])
+			value = str(data['AVAILABLECAR'])
+			task[column] = value
 
 	table_client = table_service.get_table_client(table_name='parking')
 	table_client.create_entity(entity=task)
