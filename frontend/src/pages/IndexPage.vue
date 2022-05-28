@@ -10,8 +10,11 @@
         </div>
       </div>
       <div class="row flex-center">
-        <div class="col-12 col-xs-10 col-sm-8 col-md-6">
+        <div class="col-12 col-xs-10 col-sm-8 col-md-4">
           <AreaChart :series="chart_series" :options="chart_options" />
+        </div>
+        <div class="col-12 col-xs-10 col-sm-8 col-md-4">
+          <AreaChart :series="chart_weekly_series" :options="chart_weekly_options" />
         </div>
       </div>
       <div class="row flex-center">
@@ -36,27 +39,12 @@ export default {
         area: "",
         lot: ""
       },
+      loading: false,
       chart_series: [],
-      loading: false
-    }
-  },
-  computed: {
-    area_list() {
-      return [...new Set(this.info.map(item => item.AREA))]
-    },
-    p_lot_list() {
-      return this.info.filter(x => x.AREA === this.selection.area)
-                      .map(x => x.NAME)
-    },
-    chart_options() {
-      return {
+      chart_weekly_series: [],
+      chart_options: {
         title : {
-          text: `Parking vacancy of ${this.selection.lot}`
-        },
-        chart: {
-          toolbar: {
-            offsetY: 20
-          }
+          text: "一天內車位數趨勢"
         },
         xaxis: {
           type: "datetime",
@@ -88,7 +76,42 @@ export default {
             }
           ]
         }
+      },
+      chart_weekly_options: {
+        title : {
+          text: "一週內車位數趨勢"
+        },
+        colors: ['#FEB019'],
+        xaxis: {
+          type: "datetime",
+          labels: {
+            datetimeUTC: false
+          }
+        },
+        yaxis: {
+          decimalsInFloat: 0
+        },
+        stroke: {
+          dashArray: [4]
+        },
+        dataLabels: {
+          enabled: false
+        },
+        tooltip: {
+          x: {
+            format: "dd MMM hh:mm TT"
+          }
+        }
       }
+    }
+  },
+  computed: {
+    area_list() {
+      return [...new Set(this.info.map(item => item.AREA))]
+    },
+    p_lot_list() {
+      return this.info.filter(x => x.AREA === this.selection.area)
+                      .map(x => x.NAME)
     }
   },
   watch: {
@@ -142,6 +165,13 @@ export default {
             name: 'LSTM prediction',
             data: lstm_pred_pairs
           },
+          {
+            name: 'Prophet prediction',
+            data: prophet_pred_pairs.slice(0, 96)
+          }
+        ]
+
+        this.chart_weekly_series = [
           {
             name: 'Prophet prediction',
             data: prophet_pred_pairs

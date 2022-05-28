@@ -2,7 +2,6 @@
 # The Python Worker is managed by Azure Functions platform
 # Manually managing azure-functions-worker may cause unexpected issues
 
-./local_wheels/prophet-1.0.1-py3-none-any.whl
 azure-functions
 azure-data-tables
 numpy

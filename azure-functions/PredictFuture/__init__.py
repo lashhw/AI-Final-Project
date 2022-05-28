@@ -52,7 +52,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     lstm_pred_times_str = [x.strftime('%Y-%m-%d %H:%M') for x in lstm_pred_times]
     lstm_pred_pairs = dict(zip(lstm_pred_times_str, lstm_pred.squeeze().tolist()))
 
-    prophet_pred, prophet_pred_times = prophet_predict(id, ids_train, 96, prophet_model)
+    prophet_pred, prophet_pred_times = prophet_predict(id, ids_train, 672, prophet_model)
     prophet_pred_times_str = [x.strftime('%Y-%m-%d %H:%M') for x in prophet_pred_times]
     prophet_pred_yhat_pairs = dict(zip(prophet_pred_times_str, prophet_pred[0]))
     prophet_pred_yhat_lower_pairs = dict(zip(prophet_pred_times_str, prophet_pred[1]))
