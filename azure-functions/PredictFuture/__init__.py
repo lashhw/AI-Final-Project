@@ -20,7 +20,7 @@ connection_string = config['CONNECTION']['ConnectionString']
 table_service = TableServiceClient.from_connection_string(connection_string)
 table_client = table_service.get_table_client('parking')
 
-ids_train = np.load('./models/lstm/files/ids_train.npy')
+ids_train = np.load('./models/common/ids_train.npy')
 scaler_min = np.load('./models/lstm/files/scaler_min.npy')
 scaler_max = np.load('./models/lstm/files/scaler_max.npy')
 
