@@ -32,14 +32,21 @@ class ParkingModel(nn.Module):
         
         x = torch.cat((x, input_extra), dim=2)
         # (N, L, 128+9+p_lot_len)
+
         x = F.relu(self.fc1(x))
         # (N, L, 128)
         x = self.bn_fc1(x.transpose(1, 2)).transpose(1, 2)
         # (N, L, 128)
+        x = self.dropout(x)
+        # (N, L, 128)
+
         x = F.relu(self.fc2(x))
         # (N, L, 128)
         x = self.bn_fc2(x.transpose(1, 2)).transpose(1, 2)
         # (N, L, 128)
+        x = self.dropout(x)
+        # (N, L, 128)
+
         x = self.fc3(x)
         # (N, predict_len) or (N, L, predict_len)
 
