@@ -29,6 +29,8 @@ class ParkingModel(nn.Module):
         if feed_last_only:
             x = x[:, -1, :].unsqueeze(1)
             # (N, 1, 128)
+            input_extra = input_extra.unsqueeze(1)
+            # (N, 1, 9+p_lot_len)
         
         x = torch.cat((x, input_extra), dim=2)
         # (N, L, 128+9+p_lot_len)
@@ -49,5 +51,9 @@ class ParkingModel(nn.Module):
 
         x = self.fc3(x)
         # (N, L, predict_len)
+
+        if feed_last_only:
+            x = x.squeeze(1)
+            # (N, predict_len)
 
         return x
