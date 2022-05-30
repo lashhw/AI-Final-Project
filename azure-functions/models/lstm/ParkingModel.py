@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 
 class ParkingModel(nn.Module):
-    def __init__(self, p_lot_len, predict_len):
+    def __init__(self, p_lot_len, predict_len, dropout_p=0.0):
         super().__init__()
         
         self.p_lot_len = p_lot_len
@@ -15,48 +15,32 @@ class ParkingModel(nn.Module):
         self.fc2 = nn.Linear(128, 128)
         self.fc3 = nn.Linear(128, predict_len)
 
-    def forward(self, input_seq, input_extra, h_in=None, feed_last_only=False):
-        batch_size = input_seq.shape[0]
-        seq_len = input_seq.shape[1]
-        input_seq = input_seq.unsqueeze(2)
-        assert input_seq.shape == (batch_size, seq_len, 1)
+        self.bn_fc1 = nn.BatchNorm1d(128)
+        self.bn_fc2 = nn.BatchNorm1d(128)
 
-        if h_in is None:
-            out, h_out = self.rnn(input_seq)
-        else:
-            out, h_out = self.rnn(input_seq, h_in)
-        assert out.shape == (batch_size, seq_len, 128)
+        self.dropout = nn.Dropout(p=dropout_p)
+
+    def forward(self, input_seq, input_extra, feed_last_only=False):
+        x = input_seq.unsqueeze(2)
+        # (N, L, 1)
+        x, _ = self.rnn(x)
+        # (N, L, 128)
 
         if feed_last_only:
-            x = out[:, -1, :]
-            assert x.shape == (batch_size, 128)
+            x = x[:, -1, :].unsqueeze(1)
+            # (N, 1, 128)
+        
+        x = torch.cat((x, input_extra), dim=2)
+        # (N, L, 128+9+p_lot_len)
+        x = F.relu(self.fc1(x))
+        # (N, L, 128)
+        x = self.bn_fc1(x.transpose(1, 2)).transpose(1, 2)
+        # (N, L, 128)
+        x = F.relu(self.fc2(x))
+        # (N, L, 128)
+        x = self.bn_fc2(x.transpose(1, 2)).transpose(1, 2)
+        # (N, L, 128)
+        x = self.fc3(x)
+        # (N, predict_len) or (N, L, predict_len)
 
-            assert input_extra.shape == (batch_size, 9+self.p_lot_len)
-
-            x = torch.cat((x, input_extra), dim=1)
-            assert x.shape == (batch_size, 128+9+self.p_lot_len)
-
-            x = F.relu(self.fc1(x))
-            assert x.shape == (batch_size, 128)
-
-            x = F.relu(self.fc2(x))
-            assert x.shape == (batch_size, 128)
-
-            x = self.fc3(x)
-            assert x.shape == (batch_size, self.predict_len)
-        else:
-            assert input_extra.shape == (batch_size, seq_len, 9+self.p_lot_len)
-
-            x = torch.cat((out, input_extra), dim=2)
-            assert x.shape == (batch_size, seq_len, 128+9+self.p_lot_len)
-
-            x = F.relu(self.fc1(x))
-            assert x.shape == (batch_size, seq_len, 128)
-
-            x = F.relu(self.fc2(x))
-            assert x.shape == (batch_size, seq_len, 128)
-
-            x = self.fc3(x)
-            assert x.shape == (batch_size, seq_len, self.predict_len)
-
-        return x, h_out
+        return x
