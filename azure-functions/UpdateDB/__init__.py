@@ -12,7 +12,7 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 connection_string = config['CONNECTION']['ConnectionString']
 
-ids_train = np.load('./PredictFuture/ids_train.npy')
+ids_train = np.load('./models/lstm/files/ids_train.npy')
 
 table_service = TableServiceClient.from_connection_string(conn_str=connection_string)
 

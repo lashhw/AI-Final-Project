@@ -1,4 +1,3 @@
-import logging
 import azure.functions as func
 from azure.data.tables import TableServiceClient
 from datetime import datetime, timedelta
@@ -7,8 +6,12 @@ import numpy as np
 import torch
 import configparser
 import json
-from .ParkingModel import ParkingModel
-from .utility import lstm_predict, prophet_predict
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from models.lstm.ParkingModel import ParkingModel
+from models.lstm.utility import lstm_predict, prophet_predict
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -17,15 +20,15 @@ connection_string = config['CONNECTION']['ConnectionString']
 table_service = TableServiceClient.from_connection_string(connection_string)
 table_client = table_service.get_table_client('parking')
 
-ids_train = np.load('./PredictFuture/ids_train.npy')
-scaler_min = np.load('./PredictFuture/scaler_min.npy')
-scaler_max = np.load('./PredictFuture/scaler_max.npy')
+ids_train = np.load('./models/lstm/files/ids_train.npy')
+scaler_min = np.load('./models/lstm/files/scaler_min.npy')
+scaler_max = np.load('./models/lstm/files/scaler_max.npy')
 
 parking_model = ParkingModel(250, 96)
-parking_model.load_state_dict(torch.load('./PredictFuture/parking_model.pt', map_location=torch.device('cpu')))
+parking_model.load_state_dict(torch.load('./models/lstm/files/parking_model.pt', map_location=torch.device('cpu')))
 parking_model.eval()
 
-prophet_model = np.load('./PredictFuture/prophet_model.npy')
+prophet_model = np.load('./models/prophet/prophet_model.npy')
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
