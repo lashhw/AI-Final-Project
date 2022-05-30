@@ -48,6 +48,6 @@ class ParkingModel(nn.Module):
         # (N, L, 128)
 
         x = self.fc3(x)
-        # (N, predict_len) or (N, L, predict_len)
+        # (N, L, predict_len)
 
         return x
