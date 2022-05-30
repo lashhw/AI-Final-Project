@@ -9,9 +9,12 @@
           <q-select v-model="selection.lot" :options="p_lot_list" label="停車場名稱" />
         </div>
       </div>
-      <div class="row flex-center">
+      <div class="row flex-center q-gutter-sm">
         <div>
           <q-checkbox v-model="enable_baseline" label="顯示 baseline" />
+        </div>
+        <div>
+          <q-icon :name="state" color="primary" size="2em" />
         </div>
       </div>
       <div class="row flex-center">
@@ -20,11 +23,6 @@
         </div>
         <div class="col-12 col-xs-10 col-sm-8 col-md-4">
           <AreaChart :series="chart_weekly_series" :options="chart_weekly_options" />
-        </div>
-      </div>
-      <div class="row flex-center">
-        <div class="col-auto">
-          <q-spinner-dots v-show="loading" color="primary" size="2em" />
         </div>
       </div>
     </div>
@@ -44,7 +42,7 @@ export default {
         area: "",
         lot: ""
       },
-      loading: false,
+      state: "done",
       enable_baseline: false,
       chart_series_all: [],
       chart_weekly_series_all: [],
@@ -144,7 +142,7 @@ export default {
   },
   methods: {
     async update_series(id) {
-      this.loading = true;
+      this.state = 'loop';
       try {
         const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${id}&max_days=1`)
         var history = await res_history.json()
@@ -209,10 +207,13 @@ export default {
             data: average_pred_pairs 
           }
         ]
+
+        this.state = 'done'
       } catch (error) {
-        // error handling
+        this.chart_series_all = []
+        this.chart_weekly_series_all = []
+        this.state = 'close'
       }
-      this.loading = false;
     }
   },
   components: { AreaChart }
