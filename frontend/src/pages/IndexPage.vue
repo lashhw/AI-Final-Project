@@ -10,6 +10,11 @@
         </div>
       </div>
       <div class="row flex-center">
+        <div>
+          <q-checkbox v-model="enable_baseline" label="顯示 baseline" />
+        </div>
+      </div>
+      <div class="row flex-center">
         <div class="col-12 col-xs-10 col-sm-8 col-md-4">
           <AreaChart :series="chart_series" :options="chart_options" />
         </div>
@@ -40,8 +45,9 @@ export default {
         lot: ""
       },
       loading: false,
-      chart_series: [],
-      chart_weekly_series: [],
+      enable_baseline: false,
+      chart_series_all: [],
+      chart_weekly_series_all: [],
       chart_options: {
         title : {
           text: "一天內車位數趨勢"
@@ -56,7 +62,7 @@ export default {
           decimalsInFloat: 0
         },
         stroke: {
-          dashArray: [0, 4, 4]
+          dashArray: [0, 4, 4, 4]
         },
         dataLabels: {
           enabled: false
@@ -81,7 +87,7 @@ export default {
         title : {
           text: "一週內車位數趨勢"
         },
-        colors: ['#FEB019'],
+        colors: ['#FEB019', '#FF4560'],
         xaxis: {
           type: "datetime",
           labels: {
@@ -92,7 +98,7 @@ export default {
           decimalsInFloat: 0
         },
         stroke: {
-          dashArray: [4]
+          dashArray: [4, 4]
         },
         dataLabels: {
           enabled: false
@@ -112,6 +118,18 @@ export default {
     p_lot_list() {
       return this.info.filter(x => x.AREA === this.selection.area)
                       .map(x => x.NAME)
+    },
+    chart_series() {
+      if (this.enable_baseline) 
+        return this.chart_series_all
+      else
+        return this.chart_series_all.slice(0, -1)
+    },
+    chart_weekly_series() {
+      if (this.enable_baseline) 
+        return this.chart_weekly_series_all
+      else
+        return this.chart_weekly_series_all.slice(0, -1)
     }
   },
   watch: {
@@ -155,26 +173,40 @@ export default {
           var splitted = prophet_pred_pairs[i][0].split(/[- :]/)
           prophet_pred_pairs[i][0] = Date.UTC(splitted[0], splitted[1]-1, splitted[2], splitted[3], splitted[4])
         }
+
+        var average_pred_pairs = Object.entries(prediction['average'])
+        for (var i = 0; i < average_pred_pairs.length; i++) {
+          var splitted = average_pred_pairs[i][0].split(/[- :]/)
+          average_pred_pairs[i][0] = Date.UTC(splitted[0], splitted[1]-1, splitted[2], splitted[3], splitted[4])
+        }
       
-        this.chart_series = [
+        this.chart_series_all = [
           {
             name: 'History',
             data: history_pairs
           },
           {
-            name: 'LSTM prediction',
+            name: 'LSTM',
             data: lstm_pred_pairs
           },
           {
-            name: 'Prophet prediction',
+            name: 'Prophet',
             data: prophet_pred_pairs.slice(0, 96)
+          },
+          {
+            name: 'Average', 
+            data: average_pred_pairs.slice(0, 96)
           }
         ]
 
-        this.chart_weekly_series = [
+        this.chart_weekly_series_all = [
           {
-            name: 'Prophet prediction',
+            name: 'Prophet',
             data: prophet_pred_pairs
+          },
+          { 
+            name: 'Average', 
+            data: average_pred_pairs 
           }
         ]
       } catch (error) {

@@ -112,7 +112,7 @@ def lstm_predict(df, ids_train, scaler_min, scaler_max, parking_model):
     return prediction, prediction_times
 
 
-def prophet_predict(id, ids_train, pred_length, prophet_model, pred_start=None):
+def predict_from_numpy(id, ids_train, pred_length, model, pred_start=None):
     if pred_start is None:
         pred_start = pd.Timestamp.utcnow()
 
@@ -121,8 +121,8 @@ def prophet_predict(id, ids_train, pred_length, prophet_model, pred_start=None):
     start_idx = pred_start.weekday()*96 + \
                 (pred_start-pred_start.replace(hour=0, minute=0)).seconds//900
 
-    tmp_pred = np.concatenate([prophet_model, prophet_model], axis=2)
-    pred = tmp_pred[id_idx, :, start_idx:start_idx+pred_length].tolist()
+    tmp_pred = np.concatenate([model, model], axis=-1)
+    pred = tmp_pred[id_idx, ..., start_idx:start_idx+pred_length].tolist()
 
     future_dt = pd.date_range(start=pred_start, periods=pred_length, freq='15min')
     return pred, future_dt
