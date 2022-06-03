@@ -46,7 +46,7 @@ export default {
       chart_weekly_series_all: [],
       chart_options: {
         title : {
-          text: "一天內車位數趨勢"
+          text: "未來一天內剩餘車位數"
         },
         xaxis: {
           type: "datetime",
@@ -81,7 +81,7 @@ export default {
       },
       chart_weekly_options: {
         title : {
-          text: "一週內車位數趨勢"
+          text: "未來一週內剩餘車位數"
         },
         colors: ['#FEB019', '#FF4560'],
         xaxis: {
