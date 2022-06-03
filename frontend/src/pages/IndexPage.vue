@@ -10,12 +10,10 @@
         </div>
       </div>
       <div class="row flex-center q-gutter-sm">
-        <div>
-          <q-checkbox v-model="enable_baseline" label="顯示 baseline" />
-        </div>
-        <div>
-          <q-icon :name="state" color="primary" size="2em" />
-        </div>
+        <q-checkbox v-model="enable_baseline" label="顯示 baseline" />
+        <q-icon v-show="warning" name="warning" color="negative" size="2em" />
+        <q-icon v-show="done" name="done" color="primary" size="2em" />
+        <q-spinner-dots v-show="loading" color="primary" size="2em" />
       </div>
       <div class="row flex-center">
         <div class="col-12 col-xs-10 col-sm-8 col-md-4">
@@ -128,6 +126,15 @@ export default {
         return this.chart_weekly_series_all
       else
         return this.chart_weekly_series_all.slice(0, -1)
+    },
+    loading() {
+      return this.state == 'loading'
+    },
+    warning() {
+      return this.state == 'warning'
+    },
+    done() {
+      return this.state == 'done'
     }
   },
   watch: {
@@ -142,7 +149,7 @@ export default {
   },
   methods: {
     async update_series(id) {
-      this.state = 'loop';
+      this.state = 'loading';
       try {
         const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${id}&max_days=1`)
         var history = await res_history.json()
@@ -212,7 +219,7 @@ export default {
       } catch (error) {
         this.chart_series_all = []
         this.chart_weekly_series_all = []
-        this.state = 'close'
+        this.state = 'warning'
       }
     }
   },
