@@ -19,13 +19,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             "Pass the parking lot ID to get its historical data."
         )
 
-    max_days_str = req.params.get('max_days')
-    if not max_days_str:
-        max_days_str = '2'
-    max_days = int(max_days_str)
-
     id_name = '_' + id_str
-    date_start = (datetime.utcnow()-timedelta(days=max_days)).strftime('%Y-%m-%d')
+    date_start = (datetime.utcnow()-timedelta(days=1)).strftime('%Y-%m-%d')
 
     entities = table_client.query_entities(f"PartitionKey ge '{date_start}'", select=['RowKey', id_name])
     entities_list = list(entities)

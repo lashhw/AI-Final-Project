@@ -151,7 +151,7 @@ export default {
     async update_series(id) {
       this.state = 'loading';
       try {
-        const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${id}&max_days=1`)
+        const res_history = await fetch(`https://ntpcparking.azurewebsites.net/api/gethistory?id=${id}`)
         var history = await res_history.json()
 
         const res_prediction = await fetch(`https://ntpcparking.azurewebsites.net/api/predictfuture?id=${id}`)
