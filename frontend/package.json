@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.0.1",
   "description": "ntpcparking",
-  "productName": "ntpcparking",
+  "productName": "停車場餘位即時預測系統",
   "author": "Yen-Chieh Huang <lashhw.cs09@nycu.edu.tw>",
   "private": true,
   "scripts": {
