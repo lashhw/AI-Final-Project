@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          ntpcparking
+          停車場餘位即時預測系統
         </q-toolbar-title>
 
         <div>v0.0.1</div>
@@ -27,7 +27,7 @@
         <q-item-label
           header
         >
-          To be implemented
+          目錄
         </q-item-label>
 
         <EssentialLink
@@ -50,7 +50,7 @@ import EssentialLink from 'components/EssentialLink.vue'
 
 const linksList = [
   {
-    title: 'Github',
+    title: 'GitHub',
     caption: 'github.com/lashhw/AI-Final-Project',
     icon: 'code',
     link: 'https://github.com/lashhw/AI-Final-Project'
