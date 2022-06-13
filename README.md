@@ -4,6 +4,6 @@
 
 [Video](https://youtu.be/wCParWOSb5I)
 
-[Demo Website](https://lashhw.github.io/ai-final-project/)
+[Demo Website](https://lashhw.github.io/AI-Final-Project/)
 
 ![](https://i.imgur.com/egVkCTU.png)
