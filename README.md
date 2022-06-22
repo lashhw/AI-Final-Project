@@ -1,6 +1,7 @@
 # AI-Final-Project
 
-[Slides](Project_Team07.pdf)
+[Slides 1](Project_Team07.pdf)
+[Slides ](Presentation_Team07.pdf)
 
 [Video](https://youtu.be/wCParWOSb5I)
 
